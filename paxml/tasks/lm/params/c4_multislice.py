@@ -1,18 +1,3 @@
-# coding=utf-8
-# Copyright 2022 The Pax Authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 """Multi-Slice Language Model configurations on the T5/C4 dataset."""
 
 from absl import logging
@@ -25,6 +10,7 @@ from paxml.tasks.lm import model_params
 from paxml.tasks.lm.params import c4
 from paxml.tasks.lm.params import lm_cloud
 from praxis import layers
+from praxis import pax_fiddle
 
 
 @experiment_registry.register
@@ -82,6 +68,45 @@ class C4Spmd22BAdam4xv4_128(C4Spmd22BAdam1xv4_128):
 
 
 @experiment_registry.register
+class C4Spmd22BAdam1xv4_128LimitSteps(C4Spmd22BAdamMaxText):
+  """GPT-3 config with 22B params.
+
+  Model Parameters: Global batch size = 1 * 64 * 1 * 16 = 1024
+  """
+
+  def task(self) -> pax_fiddle.Config[tasks_lib.SingleTask]:
+    task_p = super().task()
+    task_p.train.num_train_steps = 300
+    return task_p
+
+
+@experiment_registry.register
+class C4Spmd22BAdam2xv4_128LimitSteps(C4Spmd22BAdam1xv4_128):
+  """GPT-3 config with 22B params.
+
+  Model Parameters: Global batch size = 2 * 1 * 64 * 1 * 16 = 2048
+  """
+
+  def task(self) -> pax_fiddle.Config[tasks_lib.SingleTask]:
+    task_p = super().task()
+    task_p.train.num_train_steps = 300
+    return task_p
+
+
+@experiment_registry.register
+class C4Spmd22BAdam4xv4_128LimitSteps(C4Spmd22BAdam1xv4_128):
+  """GPT-3 config with 22B params.
+
+  Model Parameters: Global batch size = 4 * 1 * 64 * 1 * 16 = 4096
+  """
+
+  def task(self) -> pax_fiddle.Config[tasks_lib.SingleTask]:
+    task_p = super().task()
+    task_p.train.num_train_steps = 300
+    return task_p
+
+
+@experiment_registry.register
 class C4Spmd22BAdam1xv4_384(C4Spmd22BAdamMaxText):
   """GPT-3 config with 22B params.
 
@@ -114,7 +139,6 @@ class C4Spmd22BAdam2xv4_384(C4Spmd22BAdam1xv4_384):
 
   DCN_MESH_SHAPE = [2, 1, 1]
   CHECKPOINT_POLICY = layers.AutodiffCheckpointType.SAVE_NOTHING
-
 
 
 @experiment_registry.register
@@ -156,3 +180,42 @@ class C4Spmd22BAdam4xv4_8(C4Spmd22BAdam1xv4_8):
   """
 
   DCN_MESH_SHAPE = [4, 1, 1]
+
+
+@experiment_registry.register
+class C4Spmd22BAdam1xv4_8LimitSteps(C4Spmd22BAdam1xv4_8):
+  """GPT-3 config with 22B params.
+
+  Model Parameters: Global batch size = 2 * 1 * 4 * 1 * 16 = 128
+  """
+
+  def task(self) -> pax_fiddle.Config[tasks_lib.SingleTask]:
+    task_p = super().task()
+    task_p.train.num_train_steps = 300
+    return task_p
+
+
+@experiment_registry.register
+class C4Spmd22BAdam2xv4_8LimitSteps(C4Spmd22BAdam2xv4_8):
+  """GPT-3 config with 22B params.
+
+  Model Parameters: Global batch size = 2 * 1 * 4 * 1 * 16 = 128
+  """
+
+  def task(self) -> pax_fiddle.Config[tasks_lib.SingleTask]:
+    task_p = super().task()
+    task_p.train.num_train_steps = 300
+    return task_p
+
+
+@experiment_registry.register
+class C4Spmd22BAdam4xv4_8LimitSteps(C4Spmd22BAdam4xv4_8):
+  """GPT-3 config with 22B params.
+
+  Model Parameters: Global batch size = 4 * 1 * 4 * 1 * 16 = 256
+  """
+
+  def task(self) -> pax_fiddle.Config[tasks_lib.SingleTask]:
+    task_p = super().task()
+    task_p.train.num_train_steps = 300
+    return task_p
