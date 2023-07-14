@@ -68,7 +68,7 @@ class C4Spmd22BAdam4xv4_128(C4Spmd22BAdam1xv4_128):
 
 
 @experiment_registry.register
-class C4Spmd22BAdam1xv4_128LimitSteps(C4Spmd22BAdamMaxText):
+class C4Spmd22BAdam1xv4_128LimitSteps(C4Spmd22BAdam1xv4_128):
   """GPT-3 config with 22B params.
 
   Model Parameters: Global batch size = 1 * 64 * 1 * 16 = 1024
